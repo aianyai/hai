@@ -44,7 +44,7 @@ async function main(): Promise<void> {
     const configPath = getConfigPath();
 
     // Resolve profile
-    const profile = resolveProfile(config, options.profile);
+    const profile = resolveProfile(config, options.use);
 
     // Check for first run
     if (isFirstRun(config)) {

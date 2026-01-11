@@ -98,7 +98,7 @@ hai "Compare these files" -f a.ts -f b.ts
 
 ```bash
 # Use a specific profile
-hai --profile claude "Hello"
+hai -u claude "Hello"
 
 # Enable thinking mode
 hai --think "Explain quantum entanglement"
@@ -236,7 +236,7 @@ You can also use literal values directly:
 | `--yes`            | `-y`  | Autonomous mode (auto-confirm)            |
 | `--chat`           |       | Chat mode (disable command execution)     |
 | `--prompt <name>`  | `-p`  | Use predefined prompt                     |
-| `--profile <name>` |       | Switch profile                            |
+| `--use <name>`     | `-u`  | Use a specific profile                    |
 | `--file <path>`    | `-f`  | Input file (can use multiple times)       |
 | `--think`          |       | Enable thinking mode                      |
 | `--no-think`       |       | Disable thinking mode                     |

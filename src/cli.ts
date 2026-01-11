@@ -24,7 +24,7 @@ export function createProgram(): Command {
     .option("-y, --yes", "Autonomous mode (auto-confirm command execution)")
     .option("--chat", "Force chat mode (disable tool use)")
     .option("-p, --prompt <name>", "Use a predefined prompt template")
-    .option("--profile <name>", "Use a specific profile")
+    .option("-u, --use <name>", "Use a specific profile")
     .option("-f, --file <path>", "Input file (can be used multiple times)", collect, [])
     .option("--think", "Enable model thinking/reasoning mode")
     .option("--no-think", "Disable model thinking mode")

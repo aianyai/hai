@@ -64,7 +64,7 @@ export interface Config {
 export interface CLIOptions {
   interact?: boolean;
   prompt?: string;
-  profile?: string;
+  use?: string;
   file?: string[];
   think?: boolean;
   stream?: boolean;
