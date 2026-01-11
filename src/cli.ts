@@ -19,22 +19,22 @@ export function createProgram(): Command {
 
   program
     .name("hai")
-    .description("A simple CLI tool for AI chat")
-    .version(VERSION, "--version")
+    .description("AI in your terminal. Run commands or ask questions - just hai it.")
     .argument("[message]", "The message to send to the AI")
     .option("-i, --interact", "Interactive mode for multi-turn conversation")
     .option("-y, --yes", "Autonomous mode (auto-confirm command execution)")
-    .option("--chat", "Force chat mode (disable tool use)")
     .option("-p, --prompt <name>", "Use a predefined prompt template")
     .option("-u, --use <name>", "Use a specific profile")
     .option("-f, --file <path>", "Input file (can be used multiple times)", collect, [])
+    .option("--chat", "Force chat mode (disable tool use)")
     .option("--think", "Enable model thinking/reasoning mode")
     .option("--no-think", "Disable model thinking mode")
     .option("--stream", "Force enable streaming output")
     .option("--no-stream", "Force disable streaming output")
     .option("--max-steps <number>", "Maximum execution steps for agent mode", parseInt)
     .option("--timeout <seconds>", "Command execution timeout in seconds", parseInt)
-    .option("--config <path>", "Path to config file");
+    .option("--config <path>", "Path to config file")
+    .version(VERSION, "-v, --version");
 
   return program;
 }
@@ -55,10 +55,18 @@ export function parseArgs(argv: string[]): ParsedArgs {
 
   const options = program.opts<CLIOptions>();
   const args = program.args;
-  const message = args[0] || "";
+  const message = args[0];
 
   return {
     message,
     options,
   };
+}
+
+/**
+ * Show help message and exit
+ */
+export function showHelp(): void {
+  const program = createProgram();
+  program.help();
 }

@@ -1,5 +1,6 @@
 import { streamText, generateText } from "ai";
-import { parseArgs } from "./cli.js";
+import chalk from "chalk";
+import { parseArgs, showHelp } from "./cli.js";
 import {
   loadConfig,
   isFirstRun,
@@ -102,8 +103,9 @@ async function main(): Promise<void> {
 
     // Check if we have any message
     if (!finalMessage && !options.interact) {
-      printError("No message provided", colorEnabled);
-      process.exit(1);
+      console.log(chalk.yellow("No message provided. See usage below:\n"));
+      showHelp();
+      return;
     }
 
     // Interactive mode

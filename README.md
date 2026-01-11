@@ -260,8 +260,8 @@ You can also use literal values directly:
 | `--max-steps <n>`  |       | Max command execution steps (default: 25) |
 | `--timeout <secs>` |       | Command timeout in seconds (default: 120) |
 | `--config <path>`  |       | Custom config file path                   |
-| `--version`        |       | Show version                              |
-| `--help`           |       | Show help                                 |
+| `--version`        | `-v`  | Show version                              |
+| `--help`           | `-h`  | Show help                                 |
 
 ## Keyboard Shortcuts
 
