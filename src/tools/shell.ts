@@ -25,12 +25,15 @@ export interface ExecResult {
  */
 function executeCommand(command: string, options: ShellToolOptions): Promise<ExecResult> {
   return new Promise((resolve) => {
-    // On Windows, set UTF-8 code page to avoid encoding issues
+    // On Windows, use PowerShell with UTF-8 encoding to avoid encoding issues
     const isWindows = process.platform === "win32";
-    const actualCommand = isWindows ? `chcp 65001 > nul && ${command}` : command;
+    const shell = isWindows ? "powershell.exe" : true;
+    const actualCommand = isWindows
+      ? `[Console]::OutputEncoding = [Text.UTF8Encoding]::new(); ${command}`
+      : command;
 
     const child = spawn(actualCommand, {
-      shell: true,
+      shell,
       cwd: options.cwd,
       timeout: options.timeout,
     });
