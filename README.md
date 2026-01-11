@@ -119,22 +119,33 @@ Configuration file: `~/.config/hai/settings.json`
 {
   "profiles": [
     {
-      "name": "gpt4",
-      "default": true,
-      "provider": "openai-compatible",
-      "model": "gpt-4o",
-      "baseURL": "https://api.openai.com/v1"
-    },
-    {
       "name": "claude",
       "provider": "anthropic",
-      "model": "claude-sonnet-4-20250514",
-      "think": true
+      "model": "claude-opus-4-5",
+      "apiKey": "$ANTHROPIC_API_KEY",
+      "baseURL": "https://api.openai.com/v1",
+      "default": true
+    },
+    {
+      "name": "gpt",
+      "provider": "openai",
+      "model": "gpt-5.2-pro",
+      "apiKey": "$OPENAI_API_KEY",
+      "baseURL": "https://api.openai.com/v1"
     },
     {
       "name": "gemini",
       "provider": "gemini",
-      "model": "gemini-2.0-flash"
+      "model": "gemini-3-pro-preview",
+      "apiKey": "$GOOGLE_API_KEY",
+      "baseURL": "https://generativelanguage.googleapis.com/v1beta"
+    },
+    {
+      "name": "deepseek",
+      "provider": "openai-compatible",
+      "model": "deepseek-reasoner",
+      "apiKey": "$DEEPSEEK_API_KEY",
+      "baseURL": "https://api.deepseek.com/v1"
     }
   ],
   "prompts": {
@@ -145,53 +156,65 @@ Configuration file: `~/.config/hai/settings.json`
 }
 ```
 
-### Providers
-
-| Provider            | Description                 | Required Config             |
-| ------------------- | --------------------------- | --------------------------- |
-| `openai`            | OpenAI Responses API        | `OPENAI_API_KEY`            |
-| `openai-compatible` | OpenAI Chat Completions API | `OPENAI_API_KEY`, `baseURL` |
-| `anthropic`         | Anthropic Claude            | `ANTHROPIC_API_KEY`         |
-| `gemini`            | Google Gemini               | `GOOGLE_API_KEY`            |
-
 ### Environment Variables
 
-API keys can be set via environment variables (takes priority over config file):
+Use `$ENV_VAR` syntax in `apiKey` and `baseURL` fields to reference environment variables:
 
-- `OPENAI_API_KEY`
-- `ANTHROPIC_API_KEY`
-- `GOOGLE_API_KEY`
+```json
+{
+  "apiKey": "$OPENAI_API_KEY",
+  "baseURL": "$MY_CUSTOM_BASE_URL"
+}
+```
+
+You can also use literal values directly:
+
+```json
+{
+  "apiKey": "sk-xxxx",
+  "baseURL": "http://localhost:11434/v1"
+}
+```
+
+### Providers
+
+| Provider            | Description                 |
+| ------------------- | --------------------------- |
+| `openai`            | OpenAI Responses API        |
+| `openai-compatible` | OpenAI Chat Completions API |
+| `anthropic`         | Anthropic Claude            |
+| `gemini`            | Google Gemini               |
 
 ## CLI Options
 
-| Option              | Short | Description                          |
-| ------------------- | ----- | ------------------------------------ |
-| `--interact`        | `-i`  | Interactive mode                     |
-| `--yes`             | `-y`  | Autonomous mode (auto-confirm)       |
-| `--chat`            |       | Chat mode (disable command execution)|
-| `--prompt <name>`   | `-p`  | Use predefined prompt                |
-| `--profile <name>`  |       | Switch profile                       |
-| `--file <path>`     | `-f`  | Input file (can use multiple times)  |
-| `--think`           |       | Enable thinking mode                 |
-| `--no-think`        |       | Disable thinking mode                |
-| `--stream`          |       | Force streaming output               |
-| `--no-stream`       |       | Disable streaming output             |
-| `--max-steps <n>`   |       | Max command execution steps (default: 25) |
-| `--timeout <secs>`  |       | Command timeout in seconds (default: 120) |
-| `--config <path>`   |       | Custom config file path              |
-| `--version`         |       | Show version                         |
-| `--help`            |       | Show help                            |
+| Option             | Short | Description                               |
+| ------------------ | ----- | ----------------------------------------- |
+| `--interact`       | `-i`  | Interactive mode                          |
+| `--yes`            | `-y`  | Autonomous mode (auto-confirm)            |
+| `--chat`           |       | Chat mode (disable command execution)     |
+| `--prompt <name>`  | `-p`  | Use predefined prompt                     |
+| `--profile <name>` |       | Switch profile                            |
+| `--file <path>`    | `-f`  | Input file (can use multiple times)       |
+| `--think`          |       | Enable thinking mode                      |
+| `--no-think`       |       | Disable thinking mode                     |
+| `--stream`         |       | Force streaming output                    |
+| `--no-stream`      |       | Disable streaming output                  |
+| `--max-steps <n>`  |       | Max command execution steps (default: 25) |
+| `--timeout <secs>` |       | Command timeout in seconds (default: 120) |
+| `--config <path>`  |       | Custom config file path                   |
+| `--version`        |       | Show version                              |
+| `--help`           |       | Show help                                 |
 
 ## Keyboard Shortcuts
 
-| Key      | Single-shot Mode | Interactive Mode         | Command Confirm |
-| -------- | ---------------- | ------------------------ | --------------- |
-| `Ctrl+C` | Exit             | Exit                     | Exit            |
-| `ESC`    | Stop output      | Stop current output      | Cancel          |
-| `Y/Enter`| -                | -                        | Execute         |
-| `n`      | -                | -                        | Skip            |
-| `a`      | -                | -                        | Execute all     |
-| `c`      | -                | -                        | Cancel          |
+| Key       | Single-shot Mode | Interactive Mode    | Command Confirm |
+| --------- | ---------------- | ------------------- | --------------- |
+| `Ctrl+C`  | Exit             | Exit                | Exit            |
+| `ESC`     | Stop output      | Stop current output | Cancel          |
+| `Y/Enter` | -                | -                   | Execute         |
+| `n`       | -                | -                   | Skip            |
+| `a`       | -                | -                   | Execute all     |
+| `c`       | -                | -                   | Cancel          |
 
 In interactive mode, pressing `ESC` interrupts the current response but allows you to continue the conversation. Use `Ctrl+C` or type `/exit` to quit.
 

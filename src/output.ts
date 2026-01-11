@@ -103,14 +103,10 @@ export function printFirstRunMessage(configPath: string, colorEnabled: boolean):
   console.log(color.white("A configuration file has been created at:", colorEnabled));
   console.log(color.cyan(`  ${configPath}`, colorEnabled));
   console.log();
-  console.log(color.white("Please edit the configuration file to add your API key.", colorEnabled));
+  console.log(color.white("Please edit the configuration file to set your API key.", colorEnabled));
   console.log();
-  console.log(color.white("You can also set API keys via environment variables:", colorEnabled));
-  console.log(
-    color.gray("  OPENAI_API_KEY     - for OpenAI and OpenAI-compatible providers", colorEnabled)
-  );
-  console.log(color.gray("  ANTHROPIC_API_KEY  - for Anthropic Claude", colorEnabled));
-  console.log(color.gray("  GOOGLE_API_KEY     - for Google Gemini", colorEnabled));
+  console.log(color.gray("Tip: Use $ENV_VAR syntax to reference environment variables:", colorEnabled));
+  console.log(color.gray('  "apiKey": "$OPENAI_API_KEY"', colorEnabled));
   console.log();
 }
 
@@ -124,9 +120,11 @@ export function printNoApiKeyError(
 ): void {
   console.error(color.red(`No API key configured for profile: ${profile}`, colorEnabled));
   console.error();
-  console.error(color.white("Please set your API key via:", colorEnabled));
-  console.error(color.gray("  1. Environment variable (e.g., OPENAI_API_KEY)", colorEnabled));
-  console.error(color.gray(`  2. Configuration file: ${configPath}`, colorEnabled));
+  console.error(color.white("Please set your API key in the configuration file:", colorEnabled));
+  console.error(color.cyan(`  ${configPath}`, colorEnabled));
+  console.error();
+  console.error(color.gray("Tip: Use $ENV_VAR syntax to reference environment variables:", colorEnabled));
+  console.error(color.gray('  "apiKey": "$OPENAI_API_KEY"', colorEnabled));
   console.error();
 }
 

@@ -1,6 +1,7 @@
 import type { LanguageModel } from "ai";
 import { streamText } from "ai";
 import type { Profile } from "../types.js";
+import { getBaseURL } from "../config.js";
 import { createOpenAIProvider } from "./openai.js";
 import { createOpenAICompatibleProvider } from "./openai-compatible.js";
 import { createAnthropicProvider } from "./anthropic.js";
@@ -26,7 +27,7 @@ type ProviderOptionsType = Parameters<typeof streamText>[0]["providerOptions"];
 export function createProvider(profile: Profile, apiKey: string): ProviderResult {
   const options: ProviderOptions = {
     apiKey,
-    baseURL: profile.baseURL,
+    baseURL: getBaseURL(profile),
     model: profile.model,
   };
 

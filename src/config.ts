@@ -50,22 +50,33 @@ export function isFirstRun(config: Config): boolean {
 }
 
 /**
- * Get API key for a profile (env var takes priority)
+ * Resolve a value that may be an environment variable reference.
+ * If the value starts with '$', treat it as an env var name and resolve it.
+ * Example: "$OPENAI_API_KEY" -> process.env.OPENAI_API_KEY
+ */
+export function resolveEnvValue(value: string | undefined): string | undefined {
+  if (!value) return undefined;
+
+  if (value.startsWith("$")) {
+    const envVarName = value.slice(1);
+    return process.env[envVarName] || undefined;
+  }
+
+  return value;
+}
+
+/**
+ * Get API key for a profile (supports $ENV_VAR syntax)
  */
 export function getApiKey(profile: Profile): string | undefined {
-  // Environment variable names by provider
-  const envVars: Record<string, string> = {
-    openai: "OPENAI_API_KEY",
-    "openai-compatible": "OPENAI_API_KEY",
-    anthropic: "ANTHROPIC_API_KEY",
-    gemini: "GOOGLE_API_KEY",
-  };
+  return resolveEnvValue(profile.apiKey);
+}
 
-  const envVar = envVars[profile.provider];
-  const envKey = envVar ? process.env[envVar] : undefined;
-
-  // Env var takes priority, then config apiKey
-  return envKey || profile.apiKey || undefined;
+/**
+ * Get base URL for a profile (supports $ENV_VAR syntax)
+ */
+export function getBaseURL(profile: Profile): string | undefined {
+  return resolveEnvValue(profile.baseURL);
 }
 
 /**

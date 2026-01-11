@@ -78,14 +78,14 @@ export const DEFAULT_CONFIG: Config = {
       default: true,
       provider: "openai-compatible",
       model: "gpt-4o",
-      apiKey: "",
+      apiKey: "$OPENAI_API_KEY",
       baseURL: "https://api.openai.com/v1",
     },
     {
       name: "claude",
       provider: "anthropic",
       model: "claude-sonnet-4-20250514",
-      apiKey: "",
+      apiKey: "$ANTHROPIC_API_KEY",
     },
     {
       name: "local",
