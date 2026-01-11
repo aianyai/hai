@@ -2,7 +2,7 @@
 
 > Say hi to AI, right from your terminal
 
-[![npm version](https://badge.fury.io/js/%40aiany%2Fhai.svg)](https://www.npmjs.com/package/@aiany/hai)
+[![npm version](https://img.shields.io/npm/v/%40aiany%2Fhai?style=flat)](https://www.npmjs.org/package/@aiany/hai)
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL%203.0-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 **hai** (pronounced "hi") brings AI to your terminal. Run commands or ask questions—just hai it.
