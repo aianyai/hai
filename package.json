@@ -1,0 +1,54 @@
+{
+  "name": "@aiany/hai",
+  "version": "0.1.0",
+  "description": "A simple CLI tool for AI chat",
+  "type": "module",
+  "bin": {
+    "hai": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "format": "prettier --write src",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run lint && npm run build"
+  },
+  "keywords": [
+    "ai",
+    "cli",
+    "chat",
+    "openai",
+    "anthropic",
+    "gemini"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.0",
+    "@ai-sdk/google": "^3.0.0",
+    "@ai-sdk/openai": "^3.0.0",
+    "@ai-sdk/openai-compatible": "^2.0.0",
+    "ai": "^6.0.0",
+    "chalk": "^5.4.0",
+    "commander": "^13.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@types/node": "^22.0.0",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "prettier": "^3.7.4",
+    "tsup": "^8.4.0",
+    "typescript": "^5.7.0",
+    "typescript-eslint": "^8.52.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
