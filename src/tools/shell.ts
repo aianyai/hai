@@ -25,7 +25,11 @@ export interface ExecResult {
  */
 function executeCommand(command: string, options: ShellToolOptions): Promise<ExecResult> {
   return new Promise((resolve) => {
-    const child = spawn(command, {
+    // On Windows, set UTF-8 code page to avoid encoding issues
+    const isWindows = process.platform === "win32";
+    const actualCommand = isWindows ? `chcp 65001 > nul && ${command}` : command;
+
+    const child = spawn(actualCommand, {
       shell: true,
       cwd: options.cwd,
       timeout: options.timeout,

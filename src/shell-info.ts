@@ -34,5 +34,13 @@ export function getShellInfo(): ShellInfo {
  */
 export function getSystemContext(): string {
   const { os, shell } = getShellInfo();
+
+  if (os === "Windows") {
+    return `IMPORTANT: You are on ${os} using ${shell}.
+- Use Windows commands (dir, cd, type, copy, del, etc.)
+- Do NOT use Unix commands (ls, pwd, cat, cp, rm, etc.)
+- For PowerShell, you can also use cmdlets like Get-ChildItem, Get-Location, etc.`;
+  }
+
   return `Current environment: ${os}, Shell: ${shell}. Use appropriate commands for this shell.`;
 }
