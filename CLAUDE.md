@@ -59,6 +59,13 @@ npm run format     # Prettier formatting
 
 - Use conventional commit messages (e.g., `feat:`, `fix:`, `docs:`, `refactor:`, `chore:`)
 
+### CLI Design
+
+- Prefer graceful degradation over errors (e.g., fallback to safe mode instead of requiring flags)
+- Flags should be composable when logically compatible
+- Confirmation prompts: highlight shortcuts, dim the rest, show full words after selection
+- Avoid box-drawing UI that breaks on line wrap
+
 ## Configuration
 
 Location: `~/.config/hai/settings.json`
