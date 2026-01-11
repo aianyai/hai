@@ -11,6 +11,7 @@ A simple and flexible AI chat CLI tool built with [Vercel AI SDK](https://sdk.ve
 - **Predefined Prompts** - Create reusable prompt templates with `{{input}}` placeholder
 - **Thinking Mode** - Enable extended thinking for supported models (Claude, o1/o3)
 - **Streaming Output** - Real-time response streaming with color support
+- **Keyboard Shortcuts** - Interrupt output with ESC or Ctrl+C
 
 ## Installation
 
@@ -136,3 +137,16 @@ API keys can be set via environment variables (takes priority over config file):
 | `--config <path>`  |       | Custom config file path             |
 | `--version`        |       | Show version                        |
 | `--help`           |       | Show help                           |
+
+## Keyboard Shortcuts
+
+| Key      | Single-shot Mode | Interactive Mode         |
+| -------- | ---------------- | ------------------------ |
+| `Ctrl+C` | Exit             | Exit                     |
+| `ESC`    | Exit             | Interrupt current output |
+
+In interactive mode, pressing `ESC` interrupts the current response but allows you to continue the conversation. Use `Ctrl+C` or type `/exit` to quit.
+
+## License
+
+MIT

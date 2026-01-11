@@ -18,10 +18,10 @@ const color = {
 };
 
 /**
- * Print AI message with optional color
+ * Print AI message (default color)
  */
-export function printAIMessage(message: string, colorEnabled: boolean): void {
-  console.log(color.cyan(message, colorEnabled));
+export function printAIMessage(message: string): void {
+  console.log(message);
 }
 
 /**
@@ -46,30 +46,50 @@ export function printInfo(message: string, colorEnabled: boolean): void {
 }
 
 /**
- * Stream text to stdout
+ * Print interrupt message
  */
-export async function streamOutput(
-  stream: AsyncIterable<string>,
-  colorEnabled: boolean
-): Promise<string> {
-  let fullText = "";
-
-  for await (const chunk of stream) {
-    fullText += chunk;
-    process.stdout.write(color.cyan(chunk, colorEnabled));
-  }
-
-  // Add newline at the end
+export function printInterrupt(colorEnabled: boolean): void {
   console.log();
+  console.log(color.gray("(stopped)", colorEnabled));
+}
 
-  return fullText;
+export interface StreamResult {
+  text: string;
+  aborted: boolean;
 }
 
 /**
- * Print non-streaming output
+ * Stream text to stdout
  */
-export function printOutput(text: string, colorEnabled: boolean): void {
-  console.log(color.cyan(text, colorEnabled));
+export async function streamOutput(stream: AsyncIterable<string>): Promise<StreamResult> {
+  let fullText = "";
+  let aborted = false;
+
+  try {
+    for await (const chunk of stream) {
+      fullText += chunk;
+      process.stdout.write(chunk);
+    }
+    // Add newline at the end
+    console.log();
+  } catch (error) {
+    // Check if it's an abort error
+    if (error instanceof Error && error.name === "AbortError") {
+      aborted = true;
+      // Message printed by caller at interrupt point
+    } else {
+      throw error;
+    }
+  }
+
+  return { text: fullText, aborted };
+}
+
+/**
+ * Print non-streaming output (default color)
+ */
+export function printOutput(text: string): void {
+  console.log(text);
 }
 
 /**

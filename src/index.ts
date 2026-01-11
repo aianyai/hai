@@ -20,8 +20,10 @@ import {
   printError,
   printFirstRunMessage,
   printNoApiKeyError,
+  printInterrupt,
 } from "./output.js";
 import { runInteractive } from "./interactive.js";
+import { createInterruptibleController } from "./keyboard.js";
 
 async function main(): Promise<void> {
   try {
@@ -46,7 +48,6 @@ async function main(): Promise<void> {
     if (!apiKey) {
       printNoApiKeyError(profile.name, configPath, true);
       process.exit(1);
-      return; // TypeScript needs this to understand control flow
     }
 
     // Resolve settings
@@ -90,21 +91,35 @@ async function main(): Promise<void> {
       return;
     }
 
-    // Single-shot mode
-    if (stream) {
-      const result = streamText({
-        model,
-        messages: [{ role: "user", content: finalMessage }],
-        providerOptions,
-      });
-      await streamOutput(result.textStream, colorEnabled);
-    } else {
-      const result = await generateText({
-        model,
-        messages: [{ role: "user", content: finalMessage }],
-        providerOptions,
-      });
-      printOutput(result.text, colorEnabled);
+    // Single-shot mode with keyboard interrupt support
+    const { controller, keyboard } = createInterruptibleController({
+      onInterrupt: () => {
+        printInterrupt(colorEnabled);
+      },
+    });
+
+    try {
+      if (stream) {
+        const result = streamText({
+          model,
+          messages: [{ role: "user", content: finalMessage }],
+          providerOptions,
+          abortSignal: controller.signal,
+        });
+        await streamOutput(result.textStream);
+      } else {
+        const result = await generateText({
+          model,
+          messages: [{ role: "user", content: finalMessage }],
+          providerOptions,
+          abortSignal: controller.signal,
+        });
+        printOutput(result.text);
+      }
+    } catch {
+      // Ignore abort errors - message already printed in onInterrupt
+    } finally {
+      keyboard.cleanup();
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
