@@ -109,8 +109,8 @@ async function main(): Promise<void> {
       return;
     }
 
-    // Interactive mode
-    if (options.interact) {
+    // Interactive mode (skip if stdout is piped - output would go to pipe)
+    if (options.interact && tty) {
       await runInteractive({
         model,
         providerOptions,

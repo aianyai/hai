@@ -73,6 +73,11 @@ export interface Spinner {
 }
 
 export function createSpinner(colorEnabled: boolean): Spinner {
+  // No spinner in pipe mode (non-TTY)
+  if (!isTTY()) {
+    return { start: () => {}, stop: () => {} };
+  }
+
   let frameIndex = 0;
   let timer: ReturnType<typeof setInterval> | null = null;
 
