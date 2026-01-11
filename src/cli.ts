@@ -1,8 +1,10 @@
 import { Command } from "commander";
+import { createRequire } from "node:module";
 import type { CLIOptions } from "./types.js";
 
-// Read version from package.json at build time
-const VERSION = "0.1.0";
+// Read version from package.json
+const require = createRequire(import.meta.url);
+const { version: VERSION } = require("../package.json") as { version: string };
 
 export interface ParsedArgs {
   message: string;
