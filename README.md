@@ -1,6 +1,21 @@
 # hai
 
-A simple and flexible AI chat CLI tool
+> Say hi to AI, right from your terminal
+
+[![npm version](https://badge.fury.io/js/%40aiany%2Fhai.svg)](https://www.npmjs.com/package/@aiany/hai)
+[![License: GPL-3.0](https://img.shields.io/badge/License-GPL%203.0-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
+**hai** (pronounced "hi") brings AI to your terminal. Run commands or ask questions—just hai it.
+
+```bash
+$ hai "how much disk space"
+# → runs `df -h`, explains the result
+
+$ hai "what is Docker"
+# → answers your question directly
+```
+
+No complex setup. No switching modes. Just describe what you need.
 
 ## Features
 
@@ -261,6 +276,10 @@ You can also use literal values directly:
 
 In interactive mode, pressing `ESC` interrupts the current response but allows you to continue the conversation. Use `Ctrl+C` or type `/exit` to quit.
 
+## 中文文档
+
+[查看中文 README](./docs/README.zh-CN.md)
+
 ## License
 
-MIT
+[GPL-3.0](LICENSE)

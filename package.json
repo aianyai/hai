@@ -1,7 +1,7 @@
 {
   "name": "@aiany/hai",
   "version": "0.8.0-beta",
-  "description": "A simple CLI tool for AI chat",
+  "description": "AI in your terminal. Run commands or ask questions - just hai it. Supports OpenAI, Claude, Gemini, DeepSeek & more.",
   "type": "module",
   "bin": {
     "hai": "./dist/index.js"
@@ -21,13 +21,33 @@
   "keywords": [
     "ai",
     "cli",
-    "chat",
+    "terminal",
+    "command-line",
+    "agent",
     "openai",
     "anthropic",
-    "gemini"
+    "claude",
+    "gemini",
+    "gpt",
+    "llm",
+    "chatgpt",
+    "copilot",
+    "assistant",
+    "shell",
+    "unix",
+    "pipe",
+    "automation"
   ],
-  "author": "",
-  "license": "MIT",
+  "author": "aiany",
+  "license": "GPL-3.0",
+  "homepage": "https://github.com/aianyai/hai",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aianyai/hai.git"
+  },
+  "bugs": {
+    "url": "https://github.com/aianyai/hai/issues"
+  },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.0",
     "@ai-sdk/google": "^3.0.0",
