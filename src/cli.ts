@@ -21,6 +21,8 @@ export function createProgram(): Command {
     .version(VERSION, "--version")
     .argument("[message]", "The message to send to the AI")
     .option("-i, --interact", "Interactive mode for multi-turn conversation")
+    .option("-y, --yes", "Autonomous mode (auto-confirm command execution)")
+    .option("--chat", "Force chat mode (disable tool use)")
     .option("-p, --prompt <name>", "Use a predefined prompt template")
     .option("--profile <name>", "Use a specific profile")
     .option("-f, --file <path>", "Input file (can be used multiple times)", collect, [])
@@ -28,6 +30,8 @@ export function createProgram(): Command {
     .option("--no-think", "Disable model thinking mode")
     .option("--stream", "Force enable streaming output")
     .option("--no-stream", "Force disable streaming output")
+    .option("--max-steps <number>", "Maximum execution steps for agent mode", parseInt)
+    .option("--timeout <seconds>", "Command execution timeout in seconds", parseInt)
     .option("--config <path>", "Path to config file");
 
   return program;

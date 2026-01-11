@@ -1,6 +1,9 @@
 // Provider types
 export type ProviderType = "openai" | "openai-compatible" | "anthropic" | "gemini";
 
+// Agent mode types
+export type Mode = "auto" | "chat";
+
 // Profile configuration
 export interface Profile {
   name: string;
@@ -31,6 +34,9 @@ export interface Config {
   stream?: boolean;
   think?: boolean;
   pipe?: PipeSettings;
+  mode?: Mode;
+  maxSteps?: number;
+  timeout?: number;
 }
 
 // CLI options parsed from command line
@@ -42,6 +48,10 @@ export interface CLIOptions {
   think?: boolean;
   stream?: boolean;
   config?: string;
+  yes?: boolean;
+  chat?: boolean;
+  maxSteps?: number;
+  timeout?: number;
 }
 
 // Resolved runtime options
@@ -53,6 +63,11 @@ export interface RuntimeOptions {
   stream: boolean;
   isTTY: boolean;
   colorEnabled: boolean;
+  mode: Mode;
+  autoConfirm: boolean;
+  maxSteps: number;
+  timeout: number;
+  cwd: string;
 }
 
 // Default configuration template

@@ -24,15 +24,35 @@ import {
 } from "./output.js";
 import { runInteractive } from "./interactive.js";
 import { createInterruptibleController } from "./keyboard.js";
+import { runAgent } from "./agent.js";
+import { confirmCommand } from "./confirm.js";
+import type { Mode } from "./types.js";
 
 async function main(): Promise<void> {
   try {
     // Parse CLI arguments
     const { message, options } = parseArgs(process.argv);
 
+    // Validate argument conflicts
+    if (options.yes && options.chat) {
+      printError("-y and --chat cannot be used together", true);
+      process.exit(1);
+    }
+
     // Load configuration
     const config = loadConfig(options.config);
     const configPath = getConfigPath();
+
+    // Resolve mode
+    // Non-TTY stdin with auto mode and no -y flag: fallback to chat mode
+    let mode: Mode = options.chat ? "chat" : (config.mode ?? "auto");
+    if (!process.stdin.isTTY && !options.yes && mode === "auto") {
+      mode = "chat";
+    }
+    const autoConfirm = options.yes ?? false;
+    const maxSteps = options.maxSteps ?? config.maxSteps ?? 25;
+    const timeout = (options.timeout ?? config.timeout ?? 120) * 1000; // convert to ms
+    const cwd = process.cwd();
 
     // Resolve profile
     const profile = resolveProfile(config, options.profile);
@@ -92,6 +112,11 @@ async function main(): Promise<void> {
         initialMessageDisplay: displayMessage || undefined,
         stream,
         colorEnabled,
+        mode,
+        maxSteps,
+        timeout,
+        cwd,
+        autoConfirm,
       });
       return;
     }
@@ -104,22 +129,46 @@ async function main(): Promise<void> {
     });
 
     try {
-      if (stream) {
-        const result = streamText({
+      if (mode === "auto") {
+        // Agent mode - use tool calling
+        const result = await runAgent({
           model,
           messages: [{ role: "user", content: finalMessage }],
+          maxSteps,
+          timeout,
+          autoConfirm,
+          stream,
+          cwd,
           providerOptions,
+          onConfirm: confirmCommand,
+          onCancel: () => controller.abort(),
           abortSignal: controller.signal,
         });
-        await streamOutput(result.textStream);
+
+        if (result.stream) {
+          await streamOutput(result.textStream);
+        } else {
+          printOutput(result.text);
+        }
       } else {
-        const result = await generateText({
-          model,
-          messages: [{ role: "user", content: finalMessage }],
-          providerOptions,
-          abortSignal: controller.signal,
-        });
-        printOutput(result.text);
+        // Chat mode - pure text generation without tools
+        if (stream) {
+          const result = streamText({
+            model,
+            messages: [{ role: "user", content: finalMessage }],
+            providerOptions,
+            abortSignal: controller.signal,
+          });
+          await streamOutput(result.textStream);
+        } else {
+          const result = await generateText({
+            model,
+            messages: [{ role: "user", content: finalMessage }],
+            providerOptions,
+            abortSignal: controller.signal,
+          });
+          printOutput(result.text);
+        }
       }
     } catch {
       // Ignore abort errors - message already printed in onInterrupt

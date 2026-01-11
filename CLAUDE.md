@@ -39,6 +39,12 @@ npm run format     # Prettier formatting
 - Use `{ cause: error }` in catch blocks to preserve error chain
 - Never ignore error information
 
+### Comments
+
+- Use JSDoc format for function/class documentation
+- Comments must be in English
+- Keep comments clear and concise
+
 ### Tooling
 
 - Use **Context7** to query latest SDK/library documentation when encountering type or API issues

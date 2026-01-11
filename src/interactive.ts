@@ -1,7 +1,16 @@
 import { createInterface, Interface, emitKeypressEvents } from "node:readline";
 import type { LanguageModel, ModelMessage } from "ai";
 import { streamText, generateText } from "ai";
-import { streamOutput, printOutput, getPrompt, printInterrupt, printUserMessage } from "./output.js";
+import {
+  streamOutput,
+  printOutput,
+  getPrompt,
+  printInterrupt,
+  printUserMessage,
+} from "./output.js";
+import { runAgent } from "./agent.js";
+import { confirmCommand } from "./confirm.js";
+import type { Mode } from "./types.js";
 import chalk from "chalk";
 
 const EXIT_COMMANDS = ["/exit", "/quit"];
@@ -23,14 +32,30 @@ export interface InteractiveOptions {
   initialMessageDisplay?: string;
   stream: boolean;
   colorEnabled: boolean;
+  mode: Mode;
+  maxSteps: number;
+  timeout: number;
+  cwd: string;
+  autoConfirm: boolean;
 }
 
 /**
  * Run interactive chat session
  */
 export async function runInteractive(options: InteractiveOptions): Promise<void> {
-  const { model, providerOptions, initialMessage, initialMessageDisplay, stream, colorEnabled } =
-    options;
+  const {
+    model,
+    providerOptions,
+    initialMessage,
+    initialMessageDisplay,
+    stream,
+    colorEnabled,
+    mode,
+    maxSteps,
+    timeout,
+    cwd,
+    autoConfirm,
+  } = options;
 
   const messages: ModelMessage[] = [];
   let rl: Interface | null = null;
@@ -97,26 +122,52 @@ export async function runInteractive(options: InteractiveOptions): Promise<void>
     isStreaming = true;
 
     try {
-      if (stream) {
-        const result = streamText({
+      if (mode === "auto") {
+        // Agent mode - use tool calling
+        const result = await runAgent({
           model,
           messages,
+          maxSteps,
+          timeout,
+          autoConfirm,
+          stream,
+          cwd,
           providerOptions,
+          onConfirm: confirmCommand,
+          onCancel: () => currentAbortController?.abort(),
           abortSignal: currentAbortController.signal,
         });
 
-        const { text } = await streamOutput(result.textStream);
-        return text;
+        if (result.stream) {
+          const { text } = await streamOutput(result.textStream);
+          return text;
+        } else {
+          printOutput(result.text);
+          return result.text;
+        }
       } else {
-        const result = await generateText({
-          model,
-          messages,
-          providerOptions,
-          abortSignal: currentAbortController.signal,
-        });
+        // Chat mode - pure text generation without tools
+        if (stream) {
+          const result = streamText({
+            model,
+            messages,
+            providerOptions,
+            abortSignal: currentAbortController.signal,
+          });
 
-        printOutput(result.text);
-        return result.text;
+          const { text } = await streamOutput(result.textStream);
+          return text;
+        } else {
+          const result = await generateText({
+            model,
+            messages,
+            providerOptions,
+            abortSignal: currentAbortController.signal,
+          });
+
+          printOutput(result.text);
+          return result.text;
+        }
       }
     } catch (error) {
       if (error instanceof Error && error.name === "AbortError") {
