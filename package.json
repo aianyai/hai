@@ -1,6 +1,6 @@
 {
   "name": "@aiany/hai",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "AI in your terminal. Run commands or ask questions - just hai it. Supports OpenAI, Claude, Gemini, DeepSeek & more.",
   "type": "module",
   "bin": {
