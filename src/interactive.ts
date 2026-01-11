@@ -110,7 +110,7 @@ async function chat(
       providerOptions,
     });
 
-    return streamOutput(result.fullStream, colorEnabled);
+    return streamOutput(result.textStream, colorEnabled);
   } else {
     const result = await generateText({
       model,

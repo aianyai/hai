@@ -49,16 +49,14 @@ export function printInfo(message: string, colorEnabled: boolean): void {
  * Stream text to stdout
  */
 export async function streamOutput(
-  stream: AsyncIterable<{ type: string; textDelta?: string }>,
+  stream: AsyncIterable<string>,
   colorEnabled: boolean
 ): Promise<string> {
   let fullText = "";
 
-  for await (const part of stream) {
-    if (part.type === "text-delta" && part.textDelta) {
-      fullText += part.textDelta;
-      process.stdout.write(color.cyan(part.textDelta, colorEnabled));
-    }
+  for await (const chunk of stream) {
+    fullText += chunk;
+    process.stdout.write(color.cyan(chunk, colorEnabled));
   }
 
   // Add newline at the end

@@ -97,7 +97,7 @@ async function main(): Promise<void> {
         messages: [{ role: "user", content: finalMessage }],
         providerOptions,
       });
-      await streamOutput(result.fullStream, colorEnabled);
+      await streamOutput(result.textStream, colorEnabled);
     } else {
       const result = await generateText({
         model,

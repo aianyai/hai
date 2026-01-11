@@ -49,6 +49,10 @@ npm run format     # Prettier formatting
 
 - When functionality or CLI interface changes, ask user if README.md should be updated
 
+### Git
+
+- Use conventional commit messages (e.g., `feat:`, `fix:`, `docs:`, `refactor:`, `chore:`)
+
 ## Configuration
 
 Location: `~/.config/hai/settings.json`
