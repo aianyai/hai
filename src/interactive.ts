@@ -20,6 +20,7 @@ export interface InteractiveOptions {
   model: LanguageModel;
   providerOptions?: ProviderOptionsType;
   initialMessage?: string;
+  initialMessageDisplay?: string;
   stream: boolean;
   colorEnabled: boolean;
 }
@@ -28,7 +29,8 @@ export interface InteractiveOptions {
  * Run interactive chat session
  */
 export async function runInteractive(options: InteractiveOptions): Promise<void> {
-  const { model, providerOptions, initialMessage, stream, colorEnabled } = options;
+  const { model, providerOptions, initialMessage, initialMessageDisplay, stream, colorEnabled } =
+    options;
 
   const messages: ModelMessage[] = [];
   let rl: Interface | null = null;
@@ -131,7 +133,7 @@ export async function runInteractive(options: InteractiveOptions): Promise<void>
   // Handle initial message if provided
   if (initialMessage) {
     setupStreamingKeypress();
-    printUserMessage(initialMessage, colorEnabled);
+    printUserMessage(initialMessageDisplay || initialMessage, colorEnabled);
     messages.push({ role: "user", content: initialMessage });
 
     const response = await chatWithAbort();

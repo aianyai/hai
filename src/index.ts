@@ -71,7 +71,11 @@ async function main(): Promise<void> {
     }
 
     // Process input (stdin, files, templates)
-    const finalMessage = await processInput(message, promptTemplate, options.file || []);
+    const { full: finalMessage, display: displayMessage } = await processInput(
+      message,
+      promptTemplate,
+      options.file || []
+    );
 
     // Check if we have any message
     if (!finalMessage && !options.interact) {
@@ -85,6 +89,7 @@ async function main(): Promise<void> {
         model,
         providerOptions,
         initialMessage: finalMessage || undefined,
+        initialMessageDisplay: displayMessage || undefined,
         stream,
         colorEnabled,
       });
