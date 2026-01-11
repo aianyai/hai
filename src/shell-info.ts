@@ -35,12 +35,18 @@ export function getShellInfo(): ShellInfo {
 export function getSystemContext(): string {
   const { os, shell } = getShellInfo();
 
+  const toolGuidance = `IMPORTANT: Only use the shell tool when you need to interact with the system (e.g., list files, run builds, check status, execute programs). For knowledge questions, explanations, or conversations, respond directly WITHOUT using any tools.`;
+
   if (os === "Windows") {
-    return `IMPORTANT: You are on ${os} using ${shell}.
+    return `${toolGuidance}
+
+Environment: ${os}, Shell: ${shell}.
 - Use Windows commands (dir, cd, type, copy, del, etc.)
 - Do NOT use Unix commands (ls, pwd, cat, cp, rm, etc.)
 - For PowerShell, you can also use cmdlets like Get-ChildItem, Get-Location, etc.`;
   }
 
-  return `Current environment: ${os}, Shell: ${shell}. Use appropriate commands for this shell.`;
+  return `${toolGuidance}
+
+Environment: ${os}, Shell: ${shell}. Use appropriate commands for this shell.`;
 }
