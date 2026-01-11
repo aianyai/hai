@@ -46,17 +46,62 @@ export function printInfo(message: string, colorEnabled: boolean): void {
 }
 
 /**
- * Print loading message (for non-streaming mode)
+ * Spinner animation for loading state
  */
-export function printLoading(colorEnabled: boolean): void {
-  process.stdout.write(color.gray("Thinking...", colorEnabled));
+const SPINNER_FRAMES = ["|", "/", "-", "\\"];
+const SPINNER_INTERVAL = 100; // ms
+
+// Rainbow colors: cycle through spectrum
+const SPINNER_COLORS = [
+  (s: string) => chalk.red(s),
+  (s: string) => chalk.redBright(s),
+  (s: string) => chalk.yellow(s),
+  (s: string) => chalk.yellowBright(s),
+  (s: string) => chalk.green(s),
+  (s: string) => chalk.greenBright(s),
+  (s: string) => chalk.cyan(s),
+  (s: string) => chalk.cyanBright(s),
+  (s: string) => chalk.blue(s),
+  (s: string) => chalk.blueBright(s),
+  (s: string) => chalk.magenta(s),
+  (s: string) => chalk.magentaBright(s),
+];
+
+export interface Spinner {
+  start: () => void;
+  stop: () => void;
 }
 
-/**
- * Clear loading message
- */
-export function clearLoading(): void {
-  process.stdout.write("\r\x1b[K");
+export function createSpinner(colorEnabled: boolean): Spinner {
+  let frameIndex = 0;
+  let timer: ReturnType<typeof setInterval> | null = null;
+
+  const getFrame = () => {
+    const frame = SPINNER_FRAMES[frameIndex % SPINNER_FRAMES.length];
+    if (!colorEnabled) return frame;
+    const colorFn = SPINNER_COLORS[frameIndex % SPINNER_COLORS.length];
+    return colorFn(frame);
+  };
+
+  const start = () => {
+    if (timer) return; // Already running
+    frameIndex = 0;
+    process.stdout.write(getFrame());
+    timer = setInterval(() => {
+      frameIndex++;
+      process.stdout.write("\r" + getFrame());
+    }, SPINNER_INTERVAL);
+  };
+
+  const stop = () => {
+    if (timer) {
+      clearInterval(timer);
+      timer = null;
+    }
+    process.stdout.write("\r\x1b[K"); // Clear the spinner line
+  };
+
+  return { start, stop };
 }
 
 /**

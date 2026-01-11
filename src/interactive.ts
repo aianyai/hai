@@ -7,8 +7,7 @@ import {
   getPrompt,
   printInterrupt,
   printUserMessage,
-  printLoading,
-  clearLoading,
+  createSpinner,
 } from "./output.js";
 import { runAgent } from "./agent.js";
 import { confirmCommand } from "./confirm.js";
@@ -122,12 +121,13 @@ export async function runInteractive(options: InteractiveOptions): Promise<void>
   const chatWithAbort = async (): Promise<string> => {
     currentAbortController = new AbortController();
     isStreaming = true;
+    const spinner = createSpinner(colorEnabled);
 
     try {
       if (mode === "auto") {
         // Agent mode - use tool calling
         if (!stream) {
-          printLoading(colorEnabled);
+          spinner.start();
         }
         const result = await runAgent({
           model,
@@ -141,10 +141,10 @@ export async function runInteractive(options: InteractiveOptions): Promise<void>
           onConfirm: confirmCommand,
           onCancel: () => currentAbortController?.abort(),
           onBeforeToolUse: () => {
-            if (!stream) clearLoading();
+            if (!stream) spinner.stop();
           },
           onShowLoading: () => {
-            if (!stream) printLoading(colorEnabled);
+            if (!stream) spinner.start();
           },
           abortSignal: currentAbortController.signal,
         });
@@ -169,14 +169,14 @@ export async function runInteractive(options: InteractiveOptions): Promise<void>
           const { text } = await streamOutput(result.textStream);
           return text;
         } else {
-          printLoading(colorEnabled);
+          spinner.start();
           const result = await generateText({
             model,
             messages,
             providerOptions,
             abortSignal: currentAbortController.signal,
           });
-          clearLoading();
+          spinner.stop();
           printOutput(result.text);
           return result.text;
         }

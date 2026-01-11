@@ -23,8 +23,7 @@ import {
   printFirstRunMessage,
   printNoApiKeyError,
   printInterrupt,
-  printLoading,
-  clearLoading,
+  createSpinner,
 } from "./output.js";
 import { runInteractive } from "./interactive.js";
 import { createInterruptibleController } from "./keyboard.js";
@@ -138,8 +137,9 @@ async function main(): Promise<void> {
     try {
       if (mode === "auto") {
         // Agent mode - use tool calling
+        const spinner = createSpinner(colorEnabled);
         if (!stream) {
-          printLoading(colorEnabled);
+          spinner.start();
         }
         const result = await runAgent({
           model,
@@ -153,10 +153,10 @@ async function main(): Promise<void> {
           onConfirm: confirmCommand,
           onCancel: () => controller.abort(),
           onBeforeToolUse: () => {
-            if (!stream) clearLoading();
+            if (!stream) spinner.stop();
           },
           onShowLoading: () => {
-            if (!stream) printLoading(colorEnabled);
+            if (!stream) spinner.start();
           },
           abortSignal: controller.signal,
         });
@@ -176,14 +176,15 @@ async function main(): Promise<void> {
           });
           await streamOutput(result.textStream);
         } else {
-          printLoading(colorEnabled);
+          const spinner = createSpinner(colorEnabled);
+          spinner.start();
           const result = await generateText({
             model,
             messages: [{ role: "user", content: finalMessage }],
             providerOptions,
             abortSignal: controller.signal,
           });
-          clearLoading();
+          spinner.stop();
           printOutput(result.text);
         }
       }
