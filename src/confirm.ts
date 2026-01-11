@@ -10,10 +10,22 @@ export function displayCommand(command: string): void {
 }
 
 /**
- * Display command output
+ * Display command output (max 5 lines, show count for remaining)
  */
 export function displayOutput(output: string): void {
-  console.error(chalk.gray(output));
+  const lines = output.split("\n");
+  const maxLines = 5;
+
+  console.error(); // blank line before output
+  if (lines.length <= maxLines) {
+    console.error(chalk.gray(output));
+  } else {
+    const displayedLines = lines.slice(0, maxLines).join("\n");
+    const moreCount = lines.length - maxLines;
+    console.error(chalk.gray(displayedLines));
+    console.error(chalk.gray(`... ${moreCount} more lines`));
+  }
+  console.error(); // blank line after output
 }
 
 /**

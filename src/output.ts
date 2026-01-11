@@ -70,8 +70,10 @@ export async function streamOutput(stream: AsyncIterable<string>): Promise<Strea
       fullText += chunk;
       process.stdout.write(chunk);
     }
-    // Add newline at the end
-    console.log();
+    // Add newline if output doesn't end with one
+    if (fullText.length > 0 && !fullText.endsWith("\n")) {
+      console.log();
+    }
   } catch (error) {
     // Check if it's an abort error
     if (error instanceof Error && error.name === "AbortError") {
