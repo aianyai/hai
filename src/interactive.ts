@@ -1,7 +1,7 @@
 import { createInterface, Interface, emitKeypressEvents } from "node:readline";
 import type { LanguageModel, ModelMessage } from "ai";
 import { streamText, generateText } from "ai";
-import { streamOutput, printOutput, getPrompt, printInterrupt } from "./output.js";
+import { streamOutput, printOutput, getPrompt, printInterrupt, printUserMessage } from "./output.js";
 import chalk from "chalk";
 
 const EXIT_COMMANDS = ["/exit", "/quit"];
@@ -131,6 +131,7 @@ export async function runInteractive(options: InteractiveOptions): Promise<void>
   // Handle initial message if provided
   if (initialMessage) {
     setupStreamingKeypress();
+    printUserMessage(initialMessage, colorEnabled);
     messages.push({ role: "user", content: initialMessage });
 
     const response = await chatWithAbort();
@@ -169,6 +170,10 @@ export async function runInteractive(options: InteractiveOptions): Promise<void>
       askQuestion();
       return;
     }
+
+    // Clear the input line and reprint with color
+    process.stdout.write("\x1b[1A\x1b[2K");
+    printUserMessage(trimmed, colorEnabled);
 
     // Add user message
     messages.push({ role: "user", content: trimmed });
