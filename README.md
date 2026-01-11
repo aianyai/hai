@@ -1,9 +1,10 @@
 # hai
 
-A simple and flexible AI chat CLI tool built with [Vercel AI SDK](https://sdk.vercel.ai/).
+A simple and flexible AI chat CLI tool
 
 ## Features
 
+- **Agent Mode** - AI automatically executes shell commands based on your intent
 - **Multiple AI Providers** - OpenAI, Anthropic Claude, Google Gemini, and any OpenAI-compatible API
 - **Profile Management** - Configure multiple profiles for different models and providers
 - **Interactive Mode** - Multi-turn conversations in the terminal
@@ -32,6 +33,45 @@ hai -i
 
 # Interactive mode with initial message
 hai -i "Hello"
+```
+
+### Agent Mode
+
+By default, hai runs in agent mode where AI can execute shell commands to help you:
+
+```bash
+# AI will run `ls -la` to answer
+hai "What files are in this directory?"
+
+# AI will check git status and logs
+hai "Show me recent changes in this project"
+
+# AI will run build commands
+hai "Build and test this project"
+```
+
+When a command is about to execute, you'll see a confirmation prompt:
+
+```
+▶ ls -la
+  Execute? (Yes/no/all/cancel)
+```
+
+- **Y/Enter** - Execute this command
+- **n** - Skip this command
+- **a** - Execute all remaining commands without asking
+- **c/ESC** - Cancel and stop the agent
+
+Use `-y` for autonomous mode (no confirmation):
+
+```bash
+hai -y "List all TypeScript files"
+```
+
+Use `--chat` to disable agent mode and just chat:
+
+```bash
+hai --chat "Explain what ls does"
 ```
 
 ### Pipe Input
@@ -124,26 +164,34 @@ API keys can be set via environment variables (takes priority over config file):
 
 ## CLI Options
 
-| Option             | Short | Description                         |
-| ------------------ | ----- | ----------------------------------- |
-| `--interact`       | `-i`  | Interactive mode                    |
-| `--prompt <name>`  | `-p`  | Use predefined prompt               |
-| `--profile <name>` |       | Switch profile                      |
-| `--file <path>`    | `-f`  | Input file (can use multiple times) |
-| `--think`          |       | Enable thinking mode                |
-| `--no-think`       |       | Disable thinking mode               |
-| `--stream`         |       | Force streaming output              |
-| `--no-stream`      |       | Disable streaming output            |
-| `--config <path>`  |       | Custom config file path             |
-| `--version`        |       | Show version                        |
-| `--help`           |       | Show help                           |
+| Option              | Short | Description                          |
+| ------------------- | ----- | ------------------------------------ |
+| `--interact`        | `-i`  | Interactive mode                     |
+| `--yes`             | `-y`  | Autonomous mode (auto-confirm)       |
+| `--chat`            |       | Chat mode (disable command execution)|
+| `--prompt <name>`   | `-p`  | Use predefined prompt                |
+| `--profile <name>`  |       | Switch profile                       |
+| `--file <path>`     | `-f`  | Input file (can use multiple times)  |
+| `--think`           |       | Enable thinking mode                 |
+| `--no-think`        |       | Disable thinking mode                |
+| `--stream`          |       | Force streaming output               |
+| `--no-stream`       |       | Disable streaming output             |
+| `--max-steps <n>`   |       | Max command execution steps (default: 25) |
+| `--timeout <secs>`  |       | Command timeout in seconds (default: 120) |
+| `--config <path>`   |       | Custom config file path              |
+| `--version`         |       | Show version                         |
+| `--help`            |       | Show help                            |
 
 ## Keyboard Shortcuts
 
-| Key      | Single-shot Mode | Interactive Mode         |
-| -------- | ---------------- | ------------------------ |
-| `Ctrl+C` | Exit             | Exit                     |
-| `ESC`    | Exit             | Interrupt current output |
+| Key      | Single-shot Mode | Interactive Mode         | Command Confirm |
+| -------- | ---------------- | ------------------------ | --------------- |
+| `Ctrl+C` | Exit             | Exit                     | Exit            |
+| `ESC`    | Stop output      | Stop current output      | Cancel          |
+| `Y/Enter`| -                | -                        | Execute         |
+| `n`      | -                | -                        | Skip            |
+| `a`      | -                | -                        | Execute all     |
+| `c`      | -                | -                        | Cancel          |
 
 In interactive mode, pressing `ESC` interrupts the current response but allows you to continue the conversation. Use `Ctrl+C` or type `/exit` to quit.
 
