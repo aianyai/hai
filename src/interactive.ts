@@ -7,6 +7,8 @@ import {
   getPrompt,
   printInterrupt,
   printUserMessage,
+  printLoading,
+  clearLoading,
 } from "./output.js";
 import { runAgent } from "./agent.js";
 import { confirmCommand } from "./confirm.js";
@@ -124,6 +126,9 @@ export async function runInteractive(options: InteractiveOptions): Promise<void>
     try {
       if (mode === "auto") {
         // Agent mode - use tool calling
+        if (!stream) {
+          printLoading(colorEnabled);
+        }
         const result = await runAgent({
           model,
           messages,
@@ -135,15 +140,21 @@ export async function runInteractive(options: InteractiveOptions): Promise<void>
           providerOptions,
           onConfirm: confirmCommand,
           onCancel: () => currentAbortController?.abort(),
+          onBeforeToolUse: () => {
+            if (!stream) clearLoading();
+          },
+          onShowLoading: () => {
+            if (!stream) printLoading(colorEnabled);
+          },
           abortSignal: currentAbortController.signal,
         });
 
-        if (result.stream) {
+        if (result.stream === true) {
           const { text } = await streamOutput(result.textStream);
           return text;
         } else {
-          printOutput(result.text);
-          return result.text;
+          // For non-streaming, text is already output by runAgent
+          return "";
         }
       } else {
         // Chat mode - pure text generation without tools
@@ -158,13 +169,14 @@ export async function runInteractive(options: InteractiveOptions): Promise<void>
           const { text } = await streamOutput(result.textStream);
           return text;
         } else {
+          printLoading(colorEnabled);
           const result = await generateText({
             model,
             messages,
             providerOptions,
             abortSignal: currentAbortController.signal,
           });
-
+          clearLoading();
           printOutput(result.text);
           return result.text;
         }

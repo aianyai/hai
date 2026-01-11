@@ -11,6 +11,7 @@ export interface ShellToolOptions {
   timeout: number; // in milliseconds
   onConfirm: (command: string) => Promise<ConfirmResult>;
   onCancel?: () => void; // Called when user cancels to abort the agent
+  onBeforeToolUse?: () => void; // Called before any tool use (for clearing loading indicator)
   abortSignal?: AbortSignal;
 }
 
@@ -93,6 +94,9 @@ export function createShellTool(options: ShellToolOptions) {
       command: z.string().describe("The shell command to execute"),
     }),
     execute: async ({ command }) => {
+      // Clear loading indicator before showing tool use
+      options.onBeforeToolUse?.();
+
       if (options.autoConfirm || yesToAll) {
         // Auto mode or "yes to all": show command before executing
         displayCommand(command);

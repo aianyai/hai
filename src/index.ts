@@ -23,6 +23,8 @@ import {
   printFirstRunMessage,
   printNoApiKeyError,
   printInterrupt,
+  printLoading,
+  clearLoading,
 } from "./output.js";
 import { runInteractive } from "./interactive.js";
 import { createInterruptibleController } from "./keyboard.js";
@@ -136,6 +138,9 @@ async function main(): Promise<void> {
     try {
       if (mode === "auto") {
         // Agent mode - use tool calling
+        if (!stream) {
+          printLoading(colorEnabled);
+        }
         const result = await runAgent({
           model,
           messages: [{ role: "user", content: finalMessage }],
@@ -147,14 +152,19 @@ async function main(): Promise<void> {
           providerOptions,
           onConfirm: confirmCommand,
           onCancel: () => controller.abort(),
+          onBeforeToolUse: () => {
+            if (!stream) clearLoading();
+          },
+          onShowLoading: () => {
+            if (!stream) printLoading(colorEnabled);
+          },
           abortSignal: controller.signal,
         });
 
-        if (result.stream) {
+        if (result.stream === true) {
           await streamOutput(result.textStream);
-        } else {
-          printOutput(result.text);
         }
+        // For non-streaming, text is already output by runAgent
       } else {
         // Chat mode - pure text generation without tools
         if (stream) {
@@ -166,12 +176,14 @@ async function main(): Promise<void> {
           });
           await streamOutput(result.textStream);
         } else {
+          printLoading(colorEnabled);
           const result = await generateText({
             model,
             messages: [{ role: "user", content: finalMessage }],
             providerOptions,
             abortSignal: controller.signal,
           });
+          clearLoading();
           printOutput(result.text);
         }
       }

@@ -46,6 +46,20 @@ export function printInfo(message: string, colorEnabled: boolean): void {
 }
 
 /**
+ * Print loading message (for non-streaming mode)
+ */
+export function printLoading(colorEnabled: boolean): void {
+  process.stdout.write(color.gray("Thinking...", colorEnabled));
+}
+
+/**
+ * Clear loading message
+ */
+export function clearLoading(): void {
+  process.stdout.write("\r\x1b[K");
+}
+
+/**
  * Print interrupt message
  */
 export function printInterrupt(colorEnabled: boolean): void {
