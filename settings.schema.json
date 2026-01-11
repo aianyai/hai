@@ -1,0 +1,159 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/aianyai/hai/settings.schema.json",
+  "title": "hai CLI Configuration",
+  "description": "Configuration schema for hai CLI tool",
+  "type": "object",
+  "definitions": {
+    "options": {
+      "type": "object",
+      "description": "Runtime options (can be set globally or per-profile)",
+      "properties": {
+        "stream": {
+          "type": "boolean",
+          "description": "Enable streaming output in TTY mode",
+          "default": true
+        },
+        "think": {
+          "type": "boolean",
+          "description": "Enable thinking mode",
+          "default": false
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["auto", "chat"],
+          "description": "Default mode: auto (agent with tool use) or chat (pure text)",
+          "default": "auto"
+        },
+        "maxSteps": {
+          "type": "integer",
+          "description": "Maximum command execution steps in agent mode",
+          "default": 25,
+          "minimum": 1
+        },
+        "timeout": {
+          "type": "integer",
+          "description": "Command execution timeout in seconds",
+          "default": 120,
+          "minimum": 1
+        },
+        "pipe": {
+          "type": "object",
+          "description": "Settings for pipe (non-TTY) mode",
+          "properties": {
+            "stream": {
+              "type": "boolean",
+              "description": "Enable streaming in pipe mode",
+              "default": false
+            },
+            "color": {
+              "type": "boolean",
+              "description": "Enable color output in pipe mode",
+              "default": false
+            }
+          }
+        }
+      }
+    }
+  },
+  "properties": {
+    "profiles": {
+      "type": "array",
+      "description": "List of AI provider profiles",
+      "items": {
+        "type": "object",
+        "required": ["name", "provider", "model"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Profile name for --profile option"
+          },
+          "default": {
+            "type": "boolean",
+            "description": "Set as default profile",
+            "default": false
+          },
+          "provider": {
+            "type": "string",
+            "enum": ["openai", "openai-compatible", "anthropic", "gemini"],
+            "description": "AI provider type"
+          },
+          "model": {
+            "type": "string",
+            "description": "Model name/ID to use"
+          },
+          "apiKey": {
+            "type": "string",
+            "description": "API key (supports $ENV_VAR syntax)"
+          },
+          "baseURL": {
+            "type": "string",
+            "description": "API base URL (supports $ENV_VAR syntax)"
+          },
+          "options": {
+            "$ref": "#/definitions/options",
+            "description": "Profile-specific options (overrides global options)"
+          }
+        }
+      },
+      "default": [
+        {
+          "name": "claude",
+          "provider": "anthropic",
+          "model": "claude-opus-4-5",
+          "apiKey": "$ANTHROPIC_API_KEY",
+          "baseURL": "https://api.anthropic.com/v1",
+          "default": true
+        },
+        {
+          "name": "gpt",
+          "provider": "openai",
+          "model": "gpt-5.2-pro",
+          "apiKey": "$OPENAI_API_KEY",
+          "baseURL": "https://api.openai.com/v1"
+        },
+        {
+          "name": "gemini",
+          "provider": "gemini",
+          "model": "gemini-3-pro-preview",
+          "apiKey": "$GOOGLE_API_KEY",
+          "baseURL": "https://generativelanguage.googleapis.com/v1beta"
+        },
+        {
+          "name": "deepseek",
+          "provider": "openai-compatible",
+          "model": "deepseek-reasoner",
+          "apiKey": "$DEEPSEEK_API_KEY",
+          "baseURL": "https://api.deepseek.com/v1"
+        }
+      ]
+    },
+    "prompts": {
+      "type": "object",
+      "description": "Predefined prompt templates with {{input}} placeholder",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "default": {
+        "translate": "Translate to English: {{input}}",
+        "explain": "Explain in simple terms: {{input}}"
+      }
+    },
+    "options": {
+      "$ref": "#/definitions/options",
+      "description": "Global runtime options",
+      "default": {
+        "stream": true,
+        "think": false,
+        "mode": "auto",
+        "maxSteps": 25,
+        "timeout": 120,
+        "pipe": {
+          "stream": false,
+          "color": false
+        }
+      }
+    }
+  },
+  "required": ["profiles"]
+}

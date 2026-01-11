@@ -9,6 +9,7 @@ import {
   resolveThinkMode,
   resolveStreamMode,
   resolveColorMode,
+  resolveOptions,
   getConfigPath,
 } from "./config.js";
 import { createProvider, buildProviderOptions } from "./providers/index.js";
@@ -26,7 +27,6 @@ import { runInteractive } from "./interactive.js";
 import { createInterruptibleController } from "./keyboard.js";
 import { runAgent } from "./agent.js";
 import { confirmCommand } from "./confirm.js";
-import type { Mode } from "./types.js";
 
 async function main(): Promise<void> {
   try {
@@ -42,17 +42,6 @@ async function main(): Promise<void> {
     // Load configuration
     const config = loadConfig(options.config);
     const configPath = getConfigPath();
-
-    // Resolve mode
-    // Non-TTY stdin with auto mode and no -y flag: fallback to chat mode
-    let mode: Mode = options.chat ? "chat" : (config.mode ?? "auto");
-    if (!process.stdin.isTTY && !options.yes && mode === "auto") {
-      mode = "chat";
-    }
-    const autoConfirm = options.yes ?? false;
-    const maxSteps = options.maxSteps ?? config.maxSteps ?? 25;
-    const timeout = (options.timeout ?? config.timeout ?? 120) * 1000; // convert to ms
-    const cwd = process.cwd();
 
     // Resolve profile
     const profile = resolveProfile(config, options.profile);
@@ -70,11 +59,25 @@ async function main(): Promise<void> {
       process.exit(1);
     }
 
-    // Resolve settings
+    // Resolve options (profile options override global options)
+    const resolvedOpts = resolveOptions(config, profile);
+
+    // Resolve settings with CLI overrides
     const tty = isTTY();
     const think = resolveThinkMode(options.think, profile, config);
-    const stream = resolveStreamMode(options.stream, config, tty);
-    const colorEnabled = resolveColorMode(config, tty);
+    const stream = resolveStreamMode(options.stream, profile, config, tty);
+    const colorEnabled = resolveColorMode(profile, config, tty);
+
+    // Resolve mode (CLI --chat overrides config)
+    // Non-TTY stdin with auto mode and no -y flag: fallback to chat mode
+    let mode = options.chat ? "chat" : resolvedOpts.mode;
+    if (!process.stdin.isTTY && !options.yes && mode === "auto") {
+      mode = "chat";
+    }
+    const autoConfirm = options.yes ?? false;
+    const maxSteps = options.maxSteps ?? resolvedOpts.maxSteps;
+    const timeout = (options.timeout ?? resolvedOpts.timeout) * 1000; // convert to ms
+    const cwd = process.cwd();
 
     // Create AI model
     const { model, providerType } = createProvider(profile, apiKey);

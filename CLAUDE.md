@@ -71,3 +71,5 @@ npm run format     # Prettier formatting
 Location: `~/.config/hai/settings.json`
 
 Supports multiple profiles, predefined prompts, streaming output, and thinking mode.
+
+When the settings.json interface changes (e.g., new fields, type changes), update `settings.schema.json` accordingly.

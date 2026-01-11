@@ -1,7 +1,7 @@
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import type { Config, Profile } from "./types.js";
+import type { Config, Profile, ResolvedOptions } from "./types.js";
 import { DEFAULT_CONFIG } from "./types.js";
 
 const CONFIG_DIR = join(homedir(), ".config", "hai");
@@ -123,6 +123,36 @@ export function getPromptTemplate(config: Config, name: string): string | undefi
 }
 
 /**
+ * Resolve options by merging global and profile options
+ * Priority: Profile options > Global options > Defaults
+ */
+export function resolveOptions(config: Config, profile: Profile): ResolvedOptions {
+  const defaults: ResolvedOptions = {
+    stream: true,
+    think: false,
+    mode: "auto",
+    maxSteps: 25,
+    timeout: 120,
+    pipe: { stream: false, color: false },
+  };
+
+  const global = config.options ?? {};
+  const profileOpts = profile.options ?? {};
+
+  return {
+    stream: profileOpts.stream ?? global.stream ?? defaults.stream,
+    think: profileOpts.think ?? global.think ?? defaults.think,
+    mode: profileOpts.mode ?? global.mode ?? defaults.mode,
+    maxSteps: profileOpts.maxSteps ?? global.maxSteps ?? defaults.maxSteps,
+    timeout: profileOpts.timeout ?? global.timeout ?? defaults.timeout,
+    pipe: {
+      stream: profileOpts.pipe?.stream ?? global.pipe?.stream ?? defaults.pipe.stream,
+      color: profileOpts.pipe?.color ?? global.pipe?.color ?? defaults.pipe.color,
+    },
+  };
+}
+
+/**
  * Resolve think mode setting
  * Priority: CLI > Profile > Global > Default (false)
  */
@@ -132,9 +162,8 @@ export function resolveThinkMode(
   config: Config
 ): boolean {
   if (cliThink !== undefined) return cliThink;
-  if (profile.think !== undefined) return profile.think;
-  if (config.think !== undefined) return config.think;
-  return false;
+  const options = resolveOptions(config, profile);
+  return options.think;
 }
 
 /**
@@ -143,26 +172,28 @@ export function resolveThinkMode(
  */
 export function resolveStreamMode(
   cliStream: boolean | undefined,
+  profile: Profile,
   config: Config,
   isTTY: boolean
 ): boolean {
   if (cliStream !== undefined) return cliStream;
 
+  const options = resolveOptions(config, profile);
+
   if (isTTY) {
-    // Terminal: use global stream setting
-    return config.stream !== false;
+    return options.stream;
   } else {
-    // Pipe: use pipe.stream setting
-    return config.pipe?.stream === true;
+    return options.pipe.stream;
   }
 }
 
 /**
  * Resolve color mode
  */
-export function resolveColorMode(config: Config, isTTY: boolean): boolean {
+export function resolveColorMode(profile: Profile, config: Config, isTTY: boolean): boolean {
   if (isTTY) return true;
-  return config.pipe?.color === true;
+  const options = resolveOptions(config, profile);
+  return options.pipe.color;
 }
 
 /**

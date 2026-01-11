@@ -4,6 +4,38 @@ export type ProviderType = "openai" | "openai-compatible" | "anthropic" | "gemin
 // Agent mode types
 export type Mode = "auto" | "chat";
 
+// Pipe-specific settings
+export interface PipeSettings {
+  stream?: boolean;
+  color?: boolean;
+}
+
+// Resolved pipe settings (all fields required)
+export interface ResolvedPipeSettings {
+  stream: boolean;
+  color: boolean;
+}
+
+// Runtime options (can be set globally or per-profile)
+export interface Options {
+  stream?: boolean;
+  think?: boolean;
+  mode?: Mode;
+  maxSteps?: number;
+  timeout?: number;
+  pipe?: PipeSettings;
+}
+
+// Resolved options (all fields required)
+export interface ResolvedOptions {
+  stream: boolean;
+  think: boolean;
+  mode: Mode;
+  maxSteps: number;
+  timeout: number;
+  pipe: ResolvedPipeSettings;
+}
+
 // Profile configuration
 export interface Profile {
   name: string;
@@ -12,14 +44,8 @@ export interface Profile {
   model: string;
   apiKey?: string;
   baseURL?: string;
-  think?: boolean;
+  options?: Options;
   for?: string[]; // reserved for future task routing
-}
-
-// Pipe-specific settings
-export interface PipeSettings {
-  stream?: boolean;
-  color?: boolean;
 }
 
 // Predefined prompts
@@ -31,12 +57,7 @@ export interface Prompts {
 export interface Config {
   profiles: Profile[];
   prompts?: Prompts;
-  stream?: boolean;
-  think?: boolean;
-  pipe?: PipeSettings;
-  mode?: Mode;
-  maxSteps?: number;
-  timeout?: number;
+  options?: Options;
 }
 
 // CLI options parsed from command line
@@ -74,36 +95,37 @@ export interface RuntimeOptions {
 export const DEFAULT_CONFIG: Config = {
   profiles: [
     {
-      name: "gpt4",
+      name: "claude",
+      provider: "anthropic",
+      model: "claude-opus-4-5",
+      apiKey: "$ANTHROPIC_API_KEY",
+      baseURL: "https://api.anthropic.com/v1",
       default: true,
-      provider: "openai-compatible",
-      model: "gpt-4o",
+    },
+    {
+      name: "gpt",
+      provider: "openai",
+      model: "gpt-5.2-pro",
       apiKey: "$OPENAI_API_KEY",
       baseURL: "https://api.openai.com/v1",
     },
     {
-      name: "claude",
-      provider: "anthropic",
-      model: "claude-sonnet-4-20250514",
-      apiKey: "$ANTHROPIC_API_KEY",
+      name: "gemini",
+      provider: "gemini",
+      model: "gemini-3-pro-preview",
+      apiKey: "$GOOGLE_API_KEY",
+      baseURL: "https://generativelanguage.googleapis.com/v1beta",
     },
     {
-      name: "local",
+      name: "deepseek",
       provider: "openai-compatible",
-      model: "llama3",
-      apiKey: "ollama",
-      baseURL: "http://localhost:11434/v1",
+      model: "deepseek-reasoner",
+      apiKey: "$DEEPSEEK_API_KEY",
+      baseURL: "https://api.deepseek.com/v1",
     },
   ],
   prompts: {
-    translate: "请翻译成英文：{{input}}",
-    explain: "用通俗易懂的方式解释：{{input}}",
-    code: "用代码实现以下需求：{{input}}",
-  },
-  stream: true,
-  think: false,
-  pipe: {
-    stream: false,
-    color: false,
+    translate: "Translate to English: {{input}}",
+    explain: "Explain in simple terms: {{input}}",
   },
 };

@@ -124,7 +124,10 @@ Configuration file: `~/.config/hai/settings.json`
       "model": "claude-opus-4-5",
       "apiKey": "$ANTHROPIC_API_KEY",
       "baseURL": "https://api.openai.com/v1",
-      "default": true
+      "default": true,
+      "options": {
+        "think": true
+      }
     },
     {
       "name": "gpt",
@@ -152,7 +155,47 @@ Configuration file: `~/.config/hai/settings.json`
     "translate": "Translate to English: {{input}}",
     "explain": "Explain in simple terms: {{input}}"
   },
-  "stream": true
+  "options": {
+    "stream": true,
+    "mode": "auto",
+    "maxSteps": 25,
+    "timeout": 120
+  }
+}
+```
+
+### Options
+
+Runtime options can be set globally or per-profile. Profile options override global options.
+
+| Option     | Type    | Default | Description                          |
+| ---------- | ------- | ------- | ------------------------------------ |
+| `stream`   | boolean | `true`  | Enable streaming output in TTY mode  |
+| `think`    | boolean | `false` | Enable thinking mode                 |
+| `mode`     | string  | `auto`  | `auto` (agent) or `chat` (pure text) |
+| `maxSteps` | integer | `25`    | Max command execution steps          |
+| `timeout`  | integer | `120`   | Command timeout in seconds           |
+| `pipe`     | object  | -       | Pipe mode settings (stream, color)   |
+
+Example with profile-specific options:
+
+```json
+{
+  "profiles": [
+    {
+      "name": "claude-think",
+      "provider": "anthropic",
+      "model": "claude-opus-4-5",
+      "apiKey": "$ANTHROPIC_API_KEY",
+      "options": {
+        "think": true,
+        "mode": "chat"
+      }
+    }
+  ],
+  "options": {
+    "stream": true
+  }
 }
 ```
 

@@ -105,7 +105,9 @@ export function printFirstRunMessage(configPath: string, colorEnabled: boolean):
   console.log();
   console.log(color.white("Please edit the configuration file to set your API key.", colorEnabled));
   console.log();
-  console.log(color.gray("Tip: Use $ENV_VAR syntax to reference environment variables:", colorEnabled));
+  console.log(
+    color.gray("Tip: Use $ENV_VAR syntax to reference environment variables:", colorEnabled)
+  );
   console.log(color.gray('  "apiKey": "$OPENAI_API_KEY"', colorEnabled));
   console.log();
 }
@@ -123,7 +125,9 @@ export function printNoApiKeyError(
   console.error(color.white("Please set your API key in the configuration file:", colorEnabled));
   console.error(color.cyan(`  ${configPath}`, colorEnabled));
   console.error();
-  console.error(color.gray("Tip: Use $ENV_VAR syntax to reference environment variables:", colorEnabled));
+  console.error(
+    color.gray("Tip: Use $ENV_VAR syntax to reference environment variables:", colorEnabled)
+  );
   console.error(color.gray('  "apiKey": "$OPENAI_API_KEY"', colorEnabled));
   console.error();
 }
