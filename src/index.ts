@@ -20,6 +20,7 @@ import {
   streamOutput,
   printOutput,
   printError,
+  printInfo,
   printFirstRunMessage,
   printNoApiKeyError,
   printInterrupt,
@@ -104,13 +105,19 @@ async function main(): Promise<void> {
 
     // Check if we have any message
     if (!finalMessage && !options.interact) {
-      console.log(chalk.yellow("No message provided. See usage below:\n"));
-      showHelp();
-      return;
+      if (tty) {
+        // TTY with no message: enter interactive mode
+        printInfo("Entering interactive mode...", colorEnabled);
+      } else {
+        // Non-TTY with no message: show help
+        console.log(chalk.yellow("No message provided. See usage below:\n"));
+        showHelp();
+        return;
+      }
     }
 
     // Interactive mode (skip if stdout is piped - output would go to pipe)
-    if (options.interact && tty) {
+    if ((options.interact || !finalMessage) && tty) {
       await runInteractive({
         model,
         providerOptions,
