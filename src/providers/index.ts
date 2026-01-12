@@ -10,6 +10,7 @@ import { createGeminiProvider } from "./gemini.js";
 export interface ProviderOptions {
   apiKey: string;
   baseURL?: string;
+  headers?: Record<string, string>;
   model: string;
 }
 
@@ -28,6 +29,7 @@ export function createProvider(profile: Profile, apiKey: string): ProviderResult
   const options: ProviderOptions = {
     apiKey,
     baseURL: getBaseURL(profile),
+    headers: profile.headers,
     model: profile.model,
   };
 

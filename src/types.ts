@@ -56,6 +56,7 @@ export interface Profile {
   model: string;
   apiKey?: string;
   baseURL?: string;
+  headers?: Record<string, string>;
   options?: Options;
   providerOptions?: ProfileProviderOptions;
   for?: string[]; // reserved for future task routing

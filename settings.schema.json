@@ -90,6 +90,13 @@
             "type": "string",
             "description": "API base URL (supports $ENV_VAR syntax)"
           },
+          "headers": {
+            "type": "object",
+            "description": "Custom headers to include in API requests",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
           "options": {
             "$ref": "#/definitions/options",
             "description": "Profile-specific options (overrides global options)"

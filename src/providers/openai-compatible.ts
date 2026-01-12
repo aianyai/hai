@@ -15,6 +15,7 @@ export function createOpenAICompatibleProvider(options: ProviderOptions): Langua
     name: "openai-compatible",
     apiKey: options.apiKey,
     baseURL: options.baseURL,
+    headers: options.headers,
   });
 
   return provider(options.model);

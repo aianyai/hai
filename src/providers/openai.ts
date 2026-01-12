@@ -9,6 +9,7 @@ export function createOpenAIProvider(options: ProviderOptions): LanguageModel {
   const openai = createOpenAI({
     apiKey: options.apiKey,
     baseURL: options.baseURL,
+    headers: options.headers,
   });
 
   return openai(options.model);

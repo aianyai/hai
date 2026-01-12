@@ -9,6 +9,7 @@ export function createAnthropicProvider(options: ProviderOptions): LanguageModel
   const anthropic = createAnthropic({
     apiKey: options.apiKey,
     baseURL: options.baseURL,
+    headers: options.headers,
   });
 
   return anthropic(options.model);

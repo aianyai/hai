@@ -9,6 +9,7 @@ export function createGeminiProvider(options: ProviderOptions): LanguageModel {
   const google = createGoogleGenerativeAI({
     apiKey: options.apiKey,
     baseURL: options.baseURL,
+    headers: options.headers,
   });
 
   // Gemini doesn't have a separate thinking mode

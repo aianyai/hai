@@ -206,6 +206,7 @@ Example with profile-specific options:
         "think": true,
         "mode": "chat"
       },
+      "headers": { "X-Custom-Auth": "token" },
       "providerOptions": {
         "thinking": { "type": "enabled", "budgetTokens": 20000 }
       }
@@ -220,6 +221,10 @@ Example with profile-specific options:
 ### Provider Options
 
 `providerOptions` accepts the same parameters as AI SDK's providerOptions. These are passed directly to the provider when calling the model.
+
+### Custom Headers
+
+Use `headers` to add custom HTTP headers to API requests.
 
 ### Environment Variables
 
