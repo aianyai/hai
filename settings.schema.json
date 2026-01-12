@@ -93,6 +93,10 @@
           "options": {
             "$ref": "#/definitions/options",
             "description": "Profile-specific options (overrides global options)"
+          },
+          "providerOptions": {
+            "type": "object",
+            "description": "Provider-specific options passed to AI SDK (e.g., thinking, effort, reasoningEffort)"
           }
         }
       },

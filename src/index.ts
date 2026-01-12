@@ -7,7 +7,6 @@ import {
   getApiKey,
   resolveProfile,
   getPromptTemplate,
-  resolveThinkMode,
   resolveStreamMode,
   resolveColorMode,
   resolveOptions,
@@ -67,7 +66,6 @@ async function main(): Promise<void> {
 
     // Resolve settings with CLI overrides
     const tty = isTTY();
-    const think = resolveThinkMode(options.think, profile, config);
     const stream = resolveStreamMode(options.stream, profile, config, tty);
     const colorEnabled = resolveColorMode(profile, config, tty);
 
@@ -86,7 +84,15 @@ async function main(): Promise<void> {
     const { model, providerType } = createProvider(profile, apiKey);
 
     // Build provider options for thinking mode
-    const providerOptions = buildProviderOptions(providerType, think, profile.model);
+    // Priority: CLI --think/--no-think > providerOptions.thinking > options.think
+    const configThink = resolvedOpts.think;
+    const providerOptions = buildProviderOptions(
+      providerType,
+      options.think, // CLI think (true/false/undefined)
+      configThink, // Resolved from profile.options > global.options
+      profile.model,
+      profile.providerOptions
+    );
 
     // Get predefined prompt template if specified
     const promptTemplate = options.prompt ? getPromptTemplate(config, options.prompt) : undefined;

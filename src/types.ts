@@ -1,3 +1,8 @@
+import type { AnthropicProviderOptions } from "@ai-sdk/anthropic";
+import type { GoogleGenerativeAIProviderOptions } from "@ai-sdk/google";
+import type { OpenAIResponsesProviderOptions } from "@ai-sdk/openai";
+import type { OpenAICompatibleProviderOptions } from "@ai-sdk/openai-compatible";
+
 // Provider types
 export type ProviderType = "openai" | "openai-compatible" | "anthropic" | "gemini";
 
@@ -36,6 +41,13 @@ export interface ResolvedOptions {
   pipe: ResolvedPipeSettings;
 }
 
+// Provider options type (union of all provider options from AI SDK)
+export type ProfileProviderOptions =
+  | AnthropicProviderOptions
+  | OpenAIResponsesProviderOptions
+  | OpenAICompatibleProviderOptions
+  | GoogleGenerativeAIProviderOptions;
+
 // Profile configuration
 export interface Profile {
   name: string;
@@ -45,6 +57,7 @@ export interface Profile {
   apiKey?: string;
   baseURL?: string;
   options?: Options;
+  providerOptions?: ProfileProviderOptions;
   for?: string[]; // reserved for future task routing
 }
 
