@@ -8,6 +8,8 @@ import {
   printInterrupt,
   printUserMessage,
   createSpinner,
+  printError,
+  toError,
 } from "./output.js";
 import { runAgent } from "./agent.js";
 import { confirmCommand } from "./confirm.js";
@@ -38,6 +40,7 @@ export interface InteractiveOptions {
   timeout: number;
   cwd: string;
   autoConfirm: boolean;
+  debug?: boolean;
 }
 
 /**
@@ -56,6 +59,7 @@ export async function runInteractive(options: InteractiveOptions): Promise<void>
     timeout,
     cwd,
     autoConfirm,
+    debug,
   } = options;
 
   const messages: ModelMessage[] = [];
@@ -129,6 +133,7 @@ export async function runInteractive(options: InteractiveOptions): Promise<void>
         if (!stream) {
           spinner.start();
         }
+        let agentError: unknown;
         const result = await runAgent({
           model,
           messages,
@@ -146,27 +151,37 @@ export async function runInteractive(options: InteractiveOptions): Promise<void>
           onShowLoading: () => {
             if (!stream) spinner.start();
           },
+          onError: (error) => {
+            agentError = error;
+          },
           abortSignal: currentAbortController.signal,
         });
 
         if (result.stream === true) {
           const { text } = await streamOutput(result.textStream);
+          if (agentError) throw toError(agentError);
           return text;
         } else {
+          if (agentError) throw toError(agentError);
           // For non-streaming, text is already output by runAgent
           return "";
         }
       } else {
         // Chat mode - pure text generation without tools
         if (stream) {
+          let streamError: unknown;
           const result = streamText({
             model,
             messages,
             providerOptions,
             abortSignal: currentAbortController.signal,
+            onError: ({ error }) => {
+              streamError = error;
+            },
           });
 
           const { text } = await streamOutput(result.textStream);
+          if (streamError) throw toError(streamError);
           return text;
         } else {
           spinner.start();
@@ -252,7 +267,7 @@ export async function runInteractive(options: InteractiveOptions): Promise<void>
       messages.push({ role: "assistant", content: response });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error(colorEnabled ? chalk.red(`Error: ${errorMessage}`) : `Error: ${errorMessage}`);
+      printError(errorMessage, { colorEnabled, debug, error });
     } finally {
       // Restore readline mode
       restoreReadlineMode();

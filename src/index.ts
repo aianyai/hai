@@ -24,6 +24,7 @@ import {
   printNoApiKeyError,
   printInterrupt,
   createSpinner,
+  toError,
 } from "./output.js";
 import { runInteractive } from "./interactive.js";
 import { createInterruptibleController } from "./keyboard.js";
@@ -31,10 +32,10 @@ import { runAgent } from "./agent.js";
 import { confirmCommand } from "./confirm.js";
 
 async function main(): Promise<void> {
-  try {
-    // Parse CLI arguments
-    const { message, options } = parseArgs(process.argv);
+  // Parse CLI arguments first (outside try block so debug flag is accessible)
+  const { message, options } = parseArgs(process.argv);
 
+  try {
     // Validate argument conflicts
     if (options.yes && options.chat) {
       printError("-y and --chat cannot be used together", true);
@@ -136,6 +137,7 @@ async function main(): Promise<void> {
         timeout,
         cwd,
         autoConfirm,
+        debug: options.debug,
       });
       return;
     }
@@ -154,6 +156,7 @@ async function main(): Promise<void> {
         if (!stream) {
           spinner.start();
         }
+        let agentError: unknown;
         const result = await runAgent({
           model,
           messages: [{ role: "user", content: finalMessage }],
@@ -171,23 +174,32 @@ async function main(): Promise<void> {
           onShowLoading: () => {
             if (!stream) spinner.start();
           },
+          onError: (error) => {
+            agentError = error;
+          },
           abortSignal: controller.signal,
         });
 
         if (result.stream === true) {
           await streamOutput(result.textStream);
         }
+        if (agentError) throw toError(agentError);
         // For non-streaming, text is already output by runAgent
       } else {
         // Chat mode - pure text generation without tools
         if (stream) {
+          let streamError: unknown;
           const result = streamText({
             model,
             messages: [{ role: "user", content: finalMessage }],
             providerOptions,
             abortSignal: controller.signal,
+            onError: ({ error }) => {
+              streamError = error;
+            },
           });
           await streamOutput(result.textStream);
+          if (streamError) throw toError(streamError);
         } else {
           const spinner = createSpinner(colorEnabled);
           spinner.start();
@@ -201,20 +213,26 @@ async function main(): Promise<void> {
           printOutput(result.text);
         }
       }
-    } catch {
-      // Ignore abort errors - message already printed in onInterrupt
+    } catch (error) {
+      // Only ignore abort errors - re-throw others to outer catch
+      if (error instanceof Error && error.name === "AbortError") {
+        // Abort handled - message already printed in onInterrupt
+      } else {
+        throw error;
+      }
     } finally {
       keyboard.cleanup();
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    printError(errorMessage, true);
+    printError(errorMessage, { colorEnabled: true, debug: options.debug, error });
     process.exit(1);
   }
 }
 
 main().catch((error: unknown) => {
+  // Fallback error handler - debug flag not available here
   const errorMessage = error instanceof Error ? error.message : String(error);
-  console.error(`Error: ${errorMessage}`);
+  printError(errorMessage, { colorEnabled: true, debug: false, error });
   process.exit(1);
 });

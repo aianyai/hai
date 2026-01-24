@@ -87,6 +87,7 @@ export interface CLIOptions {
   chat?: boolean;
   maxSteps?: number;
   timeout?: number;
+  debug?: boolean;
 }
 
 // Resolved runtime options

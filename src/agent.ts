@@ -16,6 +16,7 @@ export interface AgentOptions {
   onCancel?: () => void; // Called when user cancels to abort the agent
   onBeforeToolUse?: () => void; // Called before any tool use (for clearing loading indicator)
   onShowLoading?: () => void; // Called to show loading indicator (after tool execution)
+  onError?: (error: unknown) => void; // Called when an error occurs (suppresses default console.error)
   abortSignal?: AbortSignal;
 }
 
@@ -121,6 +122,7 @@ export async function runAgent(options: AgentOptions): Promise<AgentResult> {
     stopWhen: stepCountIs(options.maxSteps),
     providerOptions: options.providerOptions,
     abortSignal: options.abortSignal,
+    onError: options.onError ? ({ error }) => options.onError!(error) : undefined,
   });
 
   if (options.stream) {

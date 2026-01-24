@@ -31,11 +31,65 @@ export function printUserMessage(message: string, colorEnabled: boolean): void {
   console.log(color.green(`> ${message}`, colorEnabled));
 }
 
+export interface PrintErrorOptions {
+  colorEnabled: boolean;
+  debug?: boolean;
+  error?: unknown;
+}
+
 /**
- * Print error message
+ * Print error message with optional debug stack trace
  */
-export function printError(message: string, colorEnabled: boolean): void {
+export function printError(message: string, options: PrintErrorOptions | boolean): void {
+  // Support legacy signature: printError(message, colorEnabled)
+  const opts: PrintErrorOptions =
+    typeof options === "boolean" ? { colorEnabled: options } : options;
+  const { colorEnabled, debug, error } = opts;
+
   console.error(color.red(`Error: ${message}`, colorEnabled));
+
+  if (debug && error instanceof Error) {
+    console.error();
+    console.error(color.gray("Stack trace:", colorEnabled));
+    console.error(color.gray(formatErrorStack(error), colorEnabled));
+  }
+}
+
+/**
+ * Format error stack with cause chain
+ */
+function formatErrorStack(error: Error, indent = ""): string {
+  const lines: string[] = [];
+
+  // Error name and message
+  const name = error.name || "Error";
+  lines.push(`${indent}${name}: ${error.message}`);
+
+  // Stack trace (skip the first line which is the error message)
+  if (error.stack) {
+    const stackLines = error.stack.split("\n").slice(1);
+    for (const line of stackLines) {
+      lines.push(`${indent}${line}`);
+    }
+  }
+
+  // Recursively format cause chain
+  if (error.cause instanceof Error) {
+    lines.push("");
+    lines.push(`${indent}Caused by:`);
+    lines.push(formatErrorStack(error.cause, indent + "  "));
+  }
+
+  return lines.join("\n");
+}
+
+/**
+ * Convert unknown error to Error instance
+ */
+export function toError(error: unknown): Error {
+  if (error instanceof Error) return error;
+  if (typeof error === "string") return new Error(error);
+  return new Error("Unknown error");
 }
 
 /**

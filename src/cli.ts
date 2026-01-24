@@ -34,6 +34,7 @@ export function createProgram(): Command {
     .option("--max-steps <number>", "Maximum execution steps for agent mode", parseInt)
     .option("--timeout <seconds>", "Command execution timeout in seconds", parseInt)
     .option("--config <path>", "Path to config file")
+    .option("--debug", "Show full error stack traces")
     .version(VERSION, "-v, --version");
 
   return program;
