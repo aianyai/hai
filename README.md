@@ -8,14 +8,14 @@
 **hai** (pronounced "hi") brings AI to your terminal. Run commands or ask questions—just hai it.
 
 ```bash
-$ hai "how much disk space"
+$ hai how much disk space
 # → runs `df -h`, explains the result
 
-$ hai "what is Docker"
+$ hai what is Docker
 # → answers your question directly
 ```
 
-No complex setup. No switching modes. Just describe what you need.
+No complex setup. No switching modes. No quotes needed. Just describe what you need.
 
 ## Features
 
@@ -40,15 +40,19 @@ npm install -g @aiany/hai
 ### Basic
 
 ```bash
-# Single question
+# Single question (quotes optional)
+hai What is the capital of France
 hai "What is the capital of France?"
 
 # Interactive mode
 hai -i
 
 # Interactive mode with initial message
-hai -i "Hello"
+hai -i Hello
 ```
+
+> **Note:** Shell special characters like `?`, `*`, `!` require quotes or escaping.
+> Use `hai "who are you?"` or `hai who are you\?`
 
 ### Agent Mode
 
@@ -59,10 +63,10 @@ By default, hai runs in agent mode where AI can execute shell commands to help y
 hai "What files are in this directory?"
 
 # AI will check git status and logs
-hai "Show me recent changes in this project"
+hai Show me recent changes in this project
 
 # AI will run build commands
-hai "Build and test this project"
+hai Build and test this project
 ```
 
 When a command is about to execute, you'll see a confirmation prompt:
@@ -80,13 +84,13 @@ When a command is about to execute, you'll see a confirmation prompt:
 Use `-y` for autonomous mode (no confirmation):
 
 ```bash
-hai -y "List all TypeScript files"
+hai -y List all TypeScript files
 ```
 
 Use `--chat` to disable agent mode and just chat:
 
 ```bash
-hai --chat "Explain what ls does"
+hai --chat Explain what ls does
 ```
 
 ### Pipe Input
@@ -113,10 +117,10 @@ hai "Compare these files" -f a.ts -f b.ts
 
 ```bash
 # Use a specific profile
-hai -u claude "Hello"
+hai -u claude Hello
 
 # Enable thinking mode
-hai --think "Explain quantum entanglement"
+hai --think Explain quantum entanglement
 ```
 
 ### Predefined Prompts

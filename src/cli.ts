@@ -20,7 +20,7 @@ export function createProgram(): Command {
   program
     .name("hai")
     .description("AI in your terminal. Run commands or ask questions - just hai it.")
-    .argument("[message]", "The message to send to the AI")
+    .argument("[message...]", "The message to send to the AI")
     .option("-i, --interact", "Interactive mode for multi-turn conversation")
     .option("-y, --yes", "Autonomous mode (auto-confirm command execution)")
     .option("-p, --prompt <name>", "Use a predefined prompt template")
@@ -55,7 +55,7 @@ export function parseArgs(argv: string[]): ParsedArgs {
 
   const options = program.opts<CLIOptions>();
   const args = program.args;
-  const message = args[0];
+  const message = args.join(" ");
 
   return {
     message,
