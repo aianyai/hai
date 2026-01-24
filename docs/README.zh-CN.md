@@ -229,6 +229,7 @@ hai -p translate "Hello world"
 | `--no-stream`      |       | 禁用流式输出                      |
 | `--max-steps <n>`  |       | 最大命令执行步数（默认：25）      |
 | `--timeout <secs>` |       | 命令超时时间（默认：120秒）       |
+| `--debug`          |       | 显示完整错误堆栈信息              |
 | `--config <path>`  |       | 自定义配置文件路径                |
 | `--version`        |       | 显示版本                          |
 | `--help`           |       | 显示帮助                          |

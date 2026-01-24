@@ -275,6 +275,7 @@ You can also use literal values directly:
 | `--no-stream`      |       | Disable streaming output                  |
 | `--max-steps <n>`  |       | Max command execution steps (default: 25) |
 | `--timeout <secs>` |       | Command timeout in seconds (default: 120) |
+| `--debug`          |       | Show full error stack traces              |
 | `--config <path>`  |       | Custom config file path                   |
 | `--version`        | `-v`  | Show version                              |
 | `--help`           | `-h`  | Show help                                 |
